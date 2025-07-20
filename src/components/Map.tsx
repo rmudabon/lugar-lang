@@ -10,7 +10,7 @@ import {
   BUHANGIN_VIA_JP_LAUREL_TO_NHA,
 } from "../constants/routes";
 import { Button } from "./ui/button";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, Minus } from "lucide-react";
 import { useState } from "react";
 
 interface Route {
@@ -66,12 +66,12 @@ export const Map = () => {
             positions={route.route}
           />
         ))}
-        <ZoomControl position="bottomright" />
+        <ZoomControl position="topright" />
       </MapContainer>
-      <div className="absolute top-0 md:w-sm w-full min-w-sm z-10">
-        <Collapsible className="bg-white shadow-md p-4 m-4 rounded-md">
+      <div className="absolute top-0 max-w-sm z-10">
+        <Collapsible className="bg-white shadow-md p-2 pl-4 md:min-w-xs m-3 rounded-md">
           <div className="flex justify-between gap-4 items-center">
-            <h4 className="text-lg font-medium">Filter Routes</h4>
+            <h4 className="text-base font-medium">Routes</h4>
             <CollapsibleTrigger asChild>
               <Button variant="ghost" size="icon">
                 <ChevronsUpDown className="w-4 h-4" />
@@ -100,6 +100,28 @@ export const Map = () => {
           </CollapsibleContent>
         </Collapsible>
       </div>
+      {selectedRoutes.length > 0 && (
+        <div className="absolute bottom-3 max-w-sm z-10">
+          <div className="bg-white shadow-md p-4 m-3 rounded-md flex flex-col items-baseline">
+            <div className="flex flex-col gap-2 w-full">
+              {selectedRoutes.map((route) => (
+                <div
+                  key={route.name}
+                  className="flex justify-between items-center gap-2"
+                >
+                  <h5 className="text-sm">{route.name}</h5>
+                  <Minus
+                    className="w-6 h-6"
+                    style={{
+                      color: route.color,
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
