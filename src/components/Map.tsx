@@ -1,40 +1,105 @@
-import { MapContainer, Polyline, TileLayer } from "react-leaflet";
+import { MapContainer, Polyline, TileLayer, ZoomControl } from "react-leaflet";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "./ui/collapsible";
 import { toLatLongList } from "../constants/util";
 import {
   BUHANGIN_VIA_JP_LAUREL_TO_DOWNTOWN,
   BUHANGIN_VIA_JP_LAUREL_TO_NHA,
 } from "../constants/routes";
+import { Button } from "./ui/button";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { useState } from "react";
 
-const buhanginJPLaurelRoute = toLatLongList(BUHANGIN_VIA_JP_LAUREL_TO_DOWNTOWN);
-const buhanginJPLaurelHomeRoute = toLatLongList(BUHANGIN_VIA_JP_LAUREL_TO_NHA);
+interface Route {
+  name: string;
+  route: [number, number][];
+  color: string;
+}
+
+const routeOptions: Route[] = [
+  {
+    name: "Buhangin via JP Laurel to Downtown",
+    route: toLatLongList(BUHANGIN_VIA_JP_LAUREL_TO_DOWNTOWN),
+    color: "red",
+  },
+  {
+    name: "Buhangin via JP Laurel to NHA",
+    route: toLatLongList(BUHANGIN_VIA_JP_LAUREL_TO_NHA),
+    color: "blue",
+  },
+];
 
 export const Map = () => {
-  return (
-    <MapContainer
-      center={[7.063366, 125.609113]}
-      zoom={17}
-      style={{
-        height: "100vh",
-        width: "100vw",
-        zIndex: 0,
-        position: "absolute",
-        top: 0,
-        left: 0,
-      }}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+  const [selectedRoutes, setSelectedRoutes] = useState<Route[]>([]);
 
-      <Polyline
-        pathOptions={{ color: "red" }}
-        positions={buhanginJPLaurelRoute}
-      />
-      <Polyline
-        pathOptions={{ color: "blue", dashArray: "9, 9" }}
-        positions={buhanginJPLaurelHomeRoute}
-      />
-    </MapContainer>
+  const toggleRoute = (route: Route) => {
+    console.log(selectedRoutes);
+    if (selectedRoutes.findIndex((r) => r.name === route.name) !== -1) {
+      setSelectedRoutes((prevRoutes) =>
+        prevRoutes.filter((prevRoute) => prevRoute.name !== route.name)
+      );
+    } else {
+      setSelectedRoutes((prevRoutes) => [...prevRoutes, route]);
+    }
+  };
+
+  return (
+    <div className="w-full">
+      <MapContainer
+        center={[7.063366, 125.609113]}
+        zoom={17}
+        zoomControl={false}
+        className="h-svh w-full z-0 absolute top-0 left-0"
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+
+        {selectedRoutes.map((route) => (
+          <Polyline
+            key={route.name}
+            pathOptions={{ color: route.color }}
+            positions={route.route}
+          />
+        ))}
+        <ZoomControl position="bottomright" />
+      </MapContainer>
+      <div className="absolute top-0 md:w-sm w-full min-w-sm z-10">
+        <Collapsible className="bg-white shadow-md p-4 m-4 rounded-md">
+          <div className="flex justify-between gap-4 items-center">
+            <h4 className="text-lg font-medium">Filter Routes</h4>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <ChevronsUpDown className="w-4 h-4" />
+              </Button>
+            </CollapsibleTrigger>
+          </div>
+          <CollapsibleContent className="max-h-64 overflow-y-auto flex flex-col gap-2 mt-2">
+            {routeOptions.map((route) => {
+              const isSelected = selectedRoutes.find(
+                (selectedRoute) => selectedRoute.name === route.name
+              );
+              return (
+                <Button
+                  key={route.name}
+                  variant="ghost"
+                  onClick={() => {
+                    toggleRoute(route);
+                  }}
+                  className="justify-between font-normal items-center px-2"
+                >
+                  {route.name}
+                  {isSelected && <Check className="w-4 h-4 text-green-600" />}
+                </Button>
+              );
+            })}
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
+    </div>
   );
 };
