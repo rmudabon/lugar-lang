@@ -1,10 +1,16 @@
-import { MapContainer, Polyline, TileLayer, ZoomControl } from "react-leaflet";
+import {
+  MapContainer,
+  Marker,
+  Polyline,
+  TileLayer,
+  ZoomControl,
+} from "react-leaflet";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "./ui/collapsible";
-import { toLatLongList } from "../constants/util";
+import { toLatLong, toLatLongList } from "../constants/util";
 import {
   BUHANGIN_VIA_JP_LAUREL_TO_DOWNTOWN,
   BUHANGIN_VIA_JP_LAUREL_TO_NHA,
@@ -12,31 +18,35 @@ import {
 import { Button } from "./ui/button";
 import { Check, ChevronsUpDown, Minus } from "lucide-react";
 import { useState } from "react";
+import { along, cleanCoords, lineString } from "@turf/turf";
+import type { Feature, GeoJsonProperties, LineString } from "geojson";
 
 interface Route {
   name: string;
-  route: [number, number][];
+  route: Feature<LineString, GeoJsonProperties>;
   color: string;
 }
 
 const routeOptions: Route[] = [
   {
     name: "Buhangin via JP Laurel to Downtown",
-    route: toLatLongList(BUHANGIN_VIA_JP_LAUREL_TO_DOWNTOWN),
+    route: lineString(BUHANGIN_VIA_JP_LAUREL_TO_DOWNTOWN),
     color: "red",
   },
   {
     name: "Buhangin via JP Laurel to NHA",
-    route: toLatLongList(BUHANGIN_VIA_JP_LAUREL_TO_NHA),
+    route: lineString(BUHANGIN_VIA_JP_LAUREL_TO_NHA),
     color: "blue",
   },
 ];
 
+const kilometerArray = Array.from({ length: 30 }, (_, index) => index + 1);
+
 export const Map = () => {
   const [selectedRoutes, setSelectedRoutes] = useState<Route[]>([]);
+  const fareMarkers: [number, number][] = [];
 
   const toggleRoute = (route: Route) => {
-    console.log(selectedRoutes);
     if (selectedRoutes.findIndex((r) => r.name === route.name) !== -1) {
       setSelectedRoutes((prevRoutes) =>
         prevRoutes.filter((prevRoute) => prevRoute.name !== route.name)
@@ -45,6 +55,29 @@ export const Map = () => {
       setSelectedRoutes((prevRoutes) => [...prevRoutes, route]);
     }
   };
+
+  if (selectedRoutes.length > 0) {
+    selectedRoutes.forEach((route) => {
+      const markers: [number, number][] = [];
+      for (const kilometer of kilometerArray) {
+        const newMarker = along(route.route, kilometer);
+        const transformedMarker = toLatLong(
+          newMarker.geometry.coordinates[0],
+          newMarker.geometry.coordinates[1]
+        );
+        if (
+          markers.findIndex(
+            (marker) =>
+              marker[0] === transformedMarker[0] &&
+              marker[1] === transformedMarker[1]
+          ) === -1
+        ) {
+          markers.push(transformedMarker);
+        }
+      }
+      fareMarkers.push(...markers);
+    });
+  }
 
   return (
     <div className="w-full">
@@ -63,9 +96,16 @@ export const Map = () => {
           <Polyline
             key={route.name}
             pathOptions={{ color: route.color }}
-            positions={route.route}
+            positions={toLatLongList(
+              cleanCoords(route.route).geometry.coordinates
+            )}
           />
         ))}
+
+        {fareMarkers.map((marker, index) => (
+          <Marker key={index} position={marker} />
+        ))}
+
         <ZoomControl position="topright" />
       </MapContainer>
       <div className="absolute top-0 max-w-sm z-10">
