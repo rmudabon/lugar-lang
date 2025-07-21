@@ -19,12 +19,12 @@ import type { FareMarkerProps, Route } from "@/interfaces";
 
 const routeOptions: Route[] = [
   {
-    name: "Buhangin via JP Laurel (1st Half)",
+    name: "Buhangin via JP Laurel (To Bajada)",
     route: lineString(BUHANGIN_VIA_JP_LAUREL_TO_DOWNTOWN),
     color: "red",
   },
   {
-    name: "Buhangin via JP Laurel (2nd Half)",
+    name: "Buhangin via JP Laurel (To Buhangin)",
     route: lineString(BUHANGIN_VIA_JP_LAUREL_TO_NHA),
     color: "blue",
   },
@@ -110,8 +110,8 @@ export const Map = () => {
 
         <ZoomControl position="topright" />
       </MapContainer>
-      <div className="absolute top-0 max-w-sm z-10 w-full">
-        <Collapsible className="bg-white shadow-md p-3 w-full max-w-72 m-3 rounded-md">
+      <div className="absolute top-0 max-w-sm z-10">
+        <Collapsible className="bg-white shadow-md p-3 min-w-72 m-3 rounded-md">
           <div className="flex justify-between gap-4 items-center">
             <h4 className="text-base font-medium">Routes</h4>
             <CollapsibleTrigger asChild>
