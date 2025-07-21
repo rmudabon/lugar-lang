@@ -1,10 +1,4 @@
-import {
-  MapContainer,
-  Marker,
-  Polyline,
-  TileLayer,
-  ZoomControl,
-} from "react-leaflet";
+import { MapContainer, Polyline, TileLayer, ZoomControl } from "react-leaflet";
 import {
   Collapsible,
   CollapsibleContent,
@@ -18,33 +12,27 @@ import {
 import { Button } from "./ui/button";
 import { Check, ChevronsUpDown, Minus } from "lucide-react";
 import { useState } from "react";
-import { along, cleanCoords, lineString } from "@turf/turf";
-import type { Feature, GeoJsonProperties, LineString } from "geojson";
+import { along, cleanCoords, length, lineString } from "@turf/turf";
 
-interface Route {
-  name: string;
-  route: Feature<LineString, GeoJsonProperties>;
-  color: string;
-}
+import { FareMarker } from "./markers/fare-marker";
+import type { FareMarkerProps, Route } from "@/interfaces";
 
 const routeOptions: Route[] = [
   {
-    name: "Buhangin via JP Laurel to Downtown",
+    name: "Buhangin via JP Laurel (1st Half)",
     route: lineString(BUHANGIN_VIA_JP_LAUREL_TO_DOWNTOWN),
     color: "red",
   },
   {
-    name: "Buhangin via JP Laurel to NHA",
+    name: "Buhangin via JP Laurel (2nd Half)",
     route: lineString(BUHANGIN_VIA_JP_LAUREL_TO_NHA),
     color: "blue",
   },
 ];
 
-const kilometerArray = Array.from({ length: 30 }, (_, index) => index + 1);
-
 export const Map = () => {
   const [selectedRoutes, setSelectedRoutes] = useState<Route[]>([]);
-  const fareMarkers: [number, number][] = [];
+  const fareMarkers: FareMarkerProps[] = [];
 
   const toggleRoute = (route: Route) => {
     if (selectedRoutes.findIndex((r) => r.name === route.name) !== -1) {
@@ -58,7 +46,12 @@ export const Map = () => {
 
   if (selectedRoutes.length > 0) {
     selectedRoutes.forEach((route) => {
-      const markers: [number, number][] = [];
+      const markers: FareMarkerProps[] = [];
+      const routeLength = length(route.route, { units: "kilometers" });
+      const kilometerArray = Array.from(
+        { length: Math.round(routeLength) },
+        (_, index) => index + 1
+      );
       for (const kilometer of kilometerArray) {
         const newMarker = along(route.route, kilometer);
         const transformedMarker = toLatLong(
@@ -68,11 +61,15 @@ export const Map = () => {
         if (
           markers.findIndex(
             (marker) =>
-              marker[0] === transformedMarker[0] &&
-              marker[1] === transformedMarker[1]
+              marker.position[0] === transformedMarker[0] &&
+              marker.position[1] === transformedMarker[1]
           ) === -1
         ) {
-          markers.push(transformedMarker);
+          markers.push({
+            kilometer,
+            position: transformedMarker,
+            color: route.color,
+          });
         }
       }
       fareMarkers.push(...markers);
@@ -103,13 +100,18 @@ export const Map = () => {
         ))}
 
         {fareMarkers.map((marker, index) => (
-          <Marker key={index} position={marker} />
+          <FareMarker
+            key={index}
+            position={marker.position}
+            kilometer={marker.kilometer}
+            color={marker.color}
+          />
         ))}
 
         <ZoomControl position="topright" />
       </MapContainer>
-      <div className="absolute top-0 max-w-sm z-10">
-        <Collapsible className="bg-white shadow-md p-2 pl-4 md:min-w-xs m-3 rounded-md">
+      <div className="absolute top-0 max-w-sm z-10 w-full">
+        <Collapsible className="bg-white shadow-md p-3 w-full max-w-72 m-3 rounded-md">
           <div className="flex justify-between gap-4 items-center">
             <h4 className="text-base font-medium">Routes</h4>
             <CollapsibleTrigger asChild>
@@ -118,7 +120,7 @@ export const Map = () => {
               </Button>
             </CollapsibleTrigger>
           </div>
-          <CollapsibleContent className="max-h-64 overflow-y-auto flex flex-col gap-2 mt-2">
+          <CollapsibleContent className="max-h-64 overflow-y-auto flex flex-col gap-2 my-2">
             {routeOptions.map((route) => {
               const isSelected = selectedRoutes.find(
                 (selectedRoute) => selectedRoute.name === route.name
@@ -130,7 +132,7 @@ export const Map = () => {
                   onClick={() => {
                     toggleRoute(route);
                   }}
-                  className="justify-between font-normal items-center px-2"
+                  className="justify-between font-normal items-center"
                 >
                   {route.name}
                   {isSelected && <Check className="w-4 h-4 text-green-600" />}

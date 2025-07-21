@@ -1,0 +1,10 @@
+//Based on LTFRB's fare chart as of July 2025
+export const STUDENT_DISCOUNT_RATE = 0.2;
+export const BASE_FARE = 13;
+export const FARE_PER_KM = 1.8; // After first four kilometers.
+export const BASE_FARE_THRESHOLD_KM = 4;
+
+const STUDENT_DISCOUNT = BASE_FARE * STUDENT_DISCOUNT_RATE;
+export const STUDENT_FARE = BASE_FARE - STUDENT_DISCOUNT;
+const STUDENT_DISCOUNT_PER_KM = FARE_PER_KM * STUDENT_DISCOUNT_RATE;
+export const STUDENT_FARE_PER_KM = FARE_PER_KM - STUDENT_DISCOUNT_PER_KM;
