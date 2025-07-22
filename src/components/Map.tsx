@@ -5,30 +5,14 @@ import {
   CollapsibleTrigger,
 } from "./ui/collapsible";
 import { toLatLong, toLatLongList } from "../constants/util";
-import {
-  BUHANGIN_VIA_JP_LAUREL_TO_DOWNTOWN,
-  BUHANGIN_VIA_JP_LAUREL_TO_NHA,
-} from "../constants/routes";
 import { Button } from "./ui/button";
 import { Check, ChevronsUpDown, Minus } from "lucide-react";
 import { useState } from "react";
-import { along, cleanCoords, length, lineString } from "@turf/turf";
+import { along, cleanCoords, length } from "@turf/turf";
 
 import { FareMarker } from "./markers/fare-marker";
 import type { FareMarkerProps, Route } from "@/interfaces";
-
-const routeOptions: Route[] = [
-  {
-    name: "Buhangin via JP Laurel (To Bajada)",
-    route: lineString(BUHANGIN_VIA_JP_LAUREL_TO_DOWNTOWN),
-    color: "red",
-  },
-  {
-    name: "Buhangin via JP Laurel (To Buhangin)",
-    route: lineString(BUHANGIN_VIA_JP_LAUREL_TO_NHA),
-    color: "blue",
-  },
-];
+import { routeOptions } from "@/constants/options";
 
 export const Map = () => {
   const [selectedRoutes, setSelectedRoutes] = useState<Route[]>([]);
