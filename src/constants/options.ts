@@ -228,12 +228,12 @@ export const routeOptions: Route[] = [
   {
     name: 'Bangkal (Inbound)',
     route: lineString(BANGKAL.INBOUND),
-    color: '#34495E',
+    color: 'red',
   },
   {
     name: 'Bangkal (Outbound)',
     route: lineString(BANGKAL.OUTBOUND),
-    color: '#2E4053',
+    color: 'teal',
   },
   {
     name: 'Baracatan/Toril/Darong (Inbound)',

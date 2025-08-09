@@ -13,4 +13,10 @@ export interface FareMarkerProps {
   color: string;
 }
 
+export interface EndMarkerProps {
+  position: [number, number];
+  color: string;
+  isOrigin: boolean;
+}
+
 export type LongLatList = [number, number][];

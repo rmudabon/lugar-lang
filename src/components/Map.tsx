@@ -11,9 +11,11 @@ import { useState } from "react";
 import { along, cleanCoords, length } from "@turf/turf";
 
 import { FareMarker } from "./markers/fare-marker";
-import type { FareMarkerProps, Route } from "@/interfaces";
+import type { EndMarkerProps, FareMarkerProps, Route } from "@/interfaces";
 import { routeOptions } from "@/constants/options";
 import type { LatLngBoundsLiteral } from "leaflet";
+import { EndMarker } from "./markers/end-marker";
+import MarkerClusterGroup from "react-leaflet-markercluster";
 
 const bounds: LatLngBoundsLiteral = [
   [7.493196470122287, 125.89645385742189],
@@ -23,6 +25,7 @@ const bounds: LatLngBoundsLiteral = [
 export const Map = () => {
   const [selectedRoutes, setSelectedRoutes] = useState<Route[]>([]);
   const fareMarkers: FareMarkerProps[] = [];
+  const endMarkers: EndMarkerProps[] = [];
 
   const toggleRoute = (route: Route) => {
     if (selectedRoutes.findIndex((r) => r.name === route.name) !== -1) {
@@ -39,7 +42,7 @@ export const Map = () => {
       const markers: FareMarkerProps[] = [];
       const routeLength = length(route.route, { units: "kilometers" });
       const kilometerArray = Array.from(
-        { length: Math.round(routeLength) },
+        { length: Math.floor(routeLength) },
         (_, index) => index + 1
       );
       for (const kilometer of kilometerArray) {
@@ -64,6 +67,22 @@ export const Map = () => {
         }
       }
       fareMarkers.push(...markers);
+      endMarkers.push({
+        position: toLatLong(
+          route.route.geometry.coordinates[0][0],
+          route.route.geometry.coordinates[0][1]
+        ),
+        color: route.color,
+        isOrigin: true,
+      });
+      endMarkers.push({
+        position: toLatLong(
+          route.route.geometry.coordinates[route.route.geometry.coordinates.length - 1][0],
+          route.route.geometry.coordinates[route.route.geometry.coordinates.length - 1][1]
+        ),
+        color: route.color,
+        isOrigin: false,
+      });
     });
   }
 
@@ -91,15 +110,25 @@ export const Map = () => {
           />
         ))}
 
-        {fareMarkers.map((marker, index) => (
-          <FareMarker
-            key={index}
-            name={marker.name}
-            position={marker.position}
-            kilometer={marker.kilometer}
-            color={marker.color}
-          />
-        ))}
+        <MarkerClusterGroup>
+          {fareMarkers.map((marker, index) => (
+            <FareMarker
+              key={index}
+              name={marker.name}
+              position={marker.position}
+              kilometer={marker.kilometer}
+              color={marker.color}
+            />
+          ))}
+          {endMarkers.map((marker, index) => (
+            <EndMarker
+              key={index}
+              position={marker.position}
+              color={marker.color}
+              isOrigin={marker.isOrigin}
+            />
+          ))}
+        </MarkerClusterGroup>
 
         <ZoomControl position="topright" />
       </MapContainer>
