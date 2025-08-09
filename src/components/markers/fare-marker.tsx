@@ -10,7 +10,7 @@ const FareIcon = ({ label, color }: { label: string; color: string }) => (
       borderColor: color,
     }}
   >
-    <h5 className="text-sm font-bold">{label}</h5>
+    <h5 className="text-sm font-bold">&#8369;{label}</h5>
   </div>
 );
 

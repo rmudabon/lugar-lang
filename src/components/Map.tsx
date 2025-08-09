@@ -13,6 +13,12 @@ import { along, cleanCoords, length } from "@turf/turf";
 import { FareMarker } from "./markers/fare-marker";
 import type { FareMarkerProps, Route } from "@/interfaces";
 import { routeOptions } from "@/constants/options";
+import type { LatLngBoundsLiteral } from "leaflet";
+
+const bounds: LatLngBoundsLiteral = [
+  [7.493196470122287, 125.89645385742189],
+  [6.767579526961214, 125.07797241210939],
+];
 
 export const Map = () => {
   const [selectedRoutes, setSelectedRoutes] = useState<Route[]>([]);
@@ -64,6 +70,7 @@ export const Map = () => {
   return (
     <div className="w-full">
       <MapContainer
+        maxBounds={bounds}
         center={[7.063366, 125.609113]}
         zoom={17}
         zoomControl={false}
