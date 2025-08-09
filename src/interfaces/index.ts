@@ -1,4 +1,4 @@
-import type { Feature, GeoJsonProperties, LineString } from "geojson";
+import type { Feature, GeoJsonProperties, LineString } from 'geojson';
 
 export interface Route {
   name: string;
@@ -7,6 +7,7 @@ export interface Route {
 }
 
 export interface FareMarkerProps {
+  name: string;
   kilometer: number;
   position: [number, number];
   color: string;

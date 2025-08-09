@@ -4,7 +4,7 @@ import {
   FARE_PER_KM,
   STUDENT_FARE,
   STUDENT_FARE_PER_KM,
-} from "./fare";
+} from './fare';
 
 export const toLatLong = (long: number, lat: number): [number, number] => [
   lat,
@@ -15,14 +15,16 @@ export const toLatLongList = (list: [number, number][]): [number, number][] =>
 
 export const calculateFare = (kilometer: number) => {
   if (kilometer <= BASE_FARE_THRESHOLD_KM) return BASE_FARE;
-  return BASE_FARE + (kilometer - BASE_FARE_THRESHOLD_KM) * FARE_PER_KM;
+  return Math.floor(
+    BASE_FARE + (kilometer - BASE_FARE_THRESHOLD_KM) * FARE_PER_KM
+  );
 };
 
 export const calculateDiscountedFare = (kilometer: number) => {
   if (kilometer <= BASE_FARE_THRESHOLD_KM) return STUDENT_FARE;
-  return (
+  return Math.floor(
     BASE_FARE -
-    STUDENT_FARE +
-    (kilometer - BASE_FARE_THRESHOLD_KM) * STUDENT_FARE_PER_KM
+      STUDENT_FARE +
+      (kilometer - BASE_FARE_THRESHOLD_KM) * STUDENT_FARE_PER_KM
   );
 };

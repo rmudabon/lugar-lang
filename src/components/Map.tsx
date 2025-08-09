@@ -50,6 +50,7 @@ export const Map = () => {
           ) === -1
         ) {
           markers.push({
+            name: route.name,
             kilometer,
             position: transformedMarker,
             color: route.color,
@@ -86,6 +87,7 @@ export const Map = () => {
         {fareMarkers.map((marker, index) => (
           <FareMarker
             key={index}
+            name={marker.name}
             position={marker.position}
             kilometer={marker.kilometer}
             color={marker.color}
@@ -127,7 +129,7 @@ export const Map = () => {
         </Collapsible>
       </div>
       {selectedRoutes.length > 0 && (
-        <div className="absolute bottom-3 max-w-sm z-10">
+        <div className="absolute bottom-3 max-w-sm max-h-64 overflow-y-auto z-10">
           <div className="bg-white shadow-md p-4 m-3 rounded-md flex flex-col items-baseline">
             <div className="flex flex-col gap-2 w-full">
               {selectedRoutes.map((route) => (

@@ -14,20 +14,26 @@ const FareIcon = ({ label, color }: { label: string; color: string }) => (
   </div>
 );
 
-export const FareMarker = ({ kilometer, position, color }: FareMarkerProps) => {
+export const FareMarker = ({
+  name,
+  kilometer,
+  position,
+  color,
+}: FareMarkerProps) => {
   const fareLabel = calculateFare(kilometer);
   return (
     <Marker
       position={position}
-      icon={<FareIcon label={fareLabel.toString()} color={color} />}
+      icon={<FareIcon label={`${fareLabel}`} color={color} />}
     >
       <Popup>
         <div className="flex flex-col gap-2">
           <div>
-            <h5 className="font-bold">{kilometer} km(s) from origin</h5>
+            <h3 className="font-bold text-center">{name}</h3>
+            <h5 className="text-center">{kilometer} km(s) from origin</h5>
           </div>
           <div className="flex justify-between items-center gap-2">
-            <h5 className="font-bold">Estimated fare:</h5>
+            <h5 className="">Estimated fare:</h5>
             <h5>&#8369;{fareLabel}</h5>
           </div>
         </div>
