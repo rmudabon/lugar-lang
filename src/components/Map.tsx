@@ -107,6 +107,11 @@ export const Map = () => {
             positions={toLatLongList(
               cleanCoords(route.route).geometry.coordinates
             )}
+            eventHandlers={{
+              click: (e) => {
+                console.log(e.target.bringToFront())
+              }
+            }}
           />
         ))}
 
