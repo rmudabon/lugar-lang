@@ -109,7 +109,7 @@ export const Map = () => {
             )}
             eventHandlers={{
               click: (e) => {
-                console.log(e.target.bringToFront())
+                e.target.bringToFront()
               }
             }}
           />
