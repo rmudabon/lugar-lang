@@ -10,13 +10,15 @@ import { EndMarker } from "./markers/end-marker";
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import { useRouteStore } from "@/lib/store";
 import { RouteSelector } from "./map/route-selector";
+import { Button } from "./ui/button";
+
 const bounds: LatLngBoundsLiteral = [
   [7.493196470122287, 125.89645385742189],
   [6.767579526961214, 125.07797241210939],
 ];
 
 export const Map = () => {
-  const { selectedRoutes } = useRouteStore();
+  const { selectedRoutes, clearRoutes } = useRouteStore();
   const fareMarkers: FareMarkerProps[] = [];
   const endMarkers: EndMarkerProps[] = [];
 
@@ -128,9 +130,9 @@ export const Map = () => {
         <RouteSelector />
       </div>
       {selectedRoutes.length > 0 && (
-        <div className="absolute bottom-3 max-w-sm max-h-64 overflow-y-auto z-10">
-          <div className="bg-white shadow-md p-4 m-3 rounded-md flex flex-col items-baseline">
-            <div className="flex flex-col gap-2 w-full">
+        <div className="absolute bottom-3 max-w-sm z-10">
+          <div className="bg-white shadow-md p-4 m-3 rounded-md  flex flex-col items-baseline space-y-2">
+            <div className="flex flex-col gap-2 w-full max-h-52 overflow-y-auto">
               {selectedRoutes.map((route) => (
                 <div
                   key={route.name}
@@ -146,6 +148,13 @@ export const Map = () => {
                 </div>
               ))}
             </div>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => clearRoutes()}
+            >
+              Clear All
+            </Button>
           </div>
         </div>
       )}
