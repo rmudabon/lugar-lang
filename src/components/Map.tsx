@@ -1,41 +1,24 @@
 import { MapContainer, Polyline, TileLayer, ZoomControl } from "react-leaflet";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "./ui/collapsible";
 import { toLatLong, toLatLongList } from "../constants/util";
-import { Button } from "./ui/button";
-import { Check, ChevronsUpDown, Minus } from "lucide-react";
-import { useState } from "react";
+import { Minus } from "lucide-react";
 import { along, cleanCoords, length } from "@turf/turf";
 
 import { FareMarker } from "./markers/fare-marker";
-import type { EndMarkerProps, FareMarkerProps, Route } from "@/interfaces";
-import { routeOptions } from "@/constants/options";
+import type { EndMarkerProps, FareMarkerProps } from "@/interfaces";
 import type { LatLngBoundsLiteral } from "leaflet";
 import { EndMarker } from "./markers/end-marker";
 import MarkerClusterGroup from "react-leaflet-markercluster";
-
+import { useRouteStore } from "@/lib/store";
+import { RouteSelector } from "./map/route-selector";
 const bounds: LatLngBoundsLiteral = [
   [7.493196470122287, 125.89645385742189],
   [6.767579526961214, 125.07797241210939],
 ];
 
 export const Map = () => {
-  const [selectedRoutes, setSelectedRoutes] = useState<Route[]>([]);
+  const { selectedRoutes } = useRouteStore();
   const fareMarkers: FareMarkerProps[] = [];
   const endMarkers: EndMarkerProps[] = [];
-
-  const toggleRoute = (route: Route) => {
-    if (selectedRoutes.findIndex((r) => r.name === route.name) !== -1) {
-      setSelectedRoutes((prevRoutes) =>
-        prevRoutes.filter((prevRoute) => prevRoute.name !== route.name)
-      );
-    } else {
-      setSelectedRoutes((prevRoutes) => [...prevRoutes, route]);
-    }
-  };
 
   if (selectedRoutes.length > 0) {
     selectedRoutes.forEach((route) => {
@@ -77,8 +60,12 @@ export const Map = () => {
       });
       endMarkers.push({
         position: toLatLong(
-          route.route.geometry.coordinates[route.route.geometry.coordinates.length - 1][0],
-          route.route.geometry.coordinates[route.route.geometry.coordinates.length - 1][1]
+          route.route.geometry.coordinates[
+            route.route.geometry.coordinates.length - 1
+          ][0],
+          route.route.geometry.coordinates[
+            route.route.geometry.coordinates.length - 1
+          ][1]
         ),
         color: route.color,
         isOrigin: false,
@@ -109,8 +96,8 @@ export const Map = () => {
             )}
             eventHandlers={{
               click: (e) => {
-                e.target.bringToFront()
-              }
+                e.target.bringToFront();
+              },
             }}
           />
         ))}
@@ -138,36 +125,7 @@ export const Map = () => {
         <ZoomControl position="topright" />
       </MapContainer>
       <div className="absolute top-0 max-w-sm z-10">
-        <Collapsible className="bg-white shadow-md p-3 min-w-72 m-3 rounded-md">
-          <div className="flex justify-between gap-4 items-center">
-            <h4 className="text-base font-medium">Routes</h4>
-            <CollapsibleTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <ChevronsUpDown className="w-4 h-4" />
-              </Button>
-            </CollapsibleTrigger>
-          </div>
-          <CollapsibleContent className="max-h-64 overflow-y-auto flex flex-col gap-2 my-2">
-            {routeOptions.map((route) => {
-              const isSelected = selectedRoutes.find(
-                (selectedRoute) => selectedRoute.name === route.name
-              );
-              return (
-                <Button
-                  key={route.name}
-                  variant="ghost"
-                  onClick={() => {
-                    toggleRoute(route);
-                  }}
-                  className="justify-between font-normal items-center"
-                >
-                  {route.name}
-                  {isSelected && <Check className="w-4 h-4 text-green-600" />}
-                </Button>
-              );
-            })}
-          </CollapsibleContent>
-        </Collapsible>
+        <RouteSelector />
       </div>
       {selectedRoutes.length > 0 && (
         <div className="absolute bottom-3 max-w-sm max-h-64 overflow-y-auto z-10">
